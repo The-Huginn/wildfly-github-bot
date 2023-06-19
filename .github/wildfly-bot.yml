@@ -2,7 +2,7 @@ wildfly:
   rules:
     - title: "test"
     - body: "test"
-      notify: [ The-Huginn ]
+      notify: [The-Huginn]
   format:
     title-check:
       pattern: "\\[TITLE-\\d+\\]\\s+.*|TITLE-\\d+\\s+.*"

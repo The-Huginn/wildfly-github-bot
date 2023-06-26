@@ -13,6 +13,7 @@ wildfly:
     commits-quantity:
       quantity: "1-3"
       message: "Too many commits in this PR!"
+
   emails:
     - rastislavbudinsky@gmail.com
     - rbudinsk@redhat.com

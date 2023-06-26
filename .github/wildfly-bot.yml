@@ -1,0 +1,18 @@
+wildfly:
+  rules:
+    - title: "test"
+    - body: "test"
+      notify: [The-non-existing-user]
+  format:
+    title-check:
+      pattern: "\\[TITLE-\\d+\\]\\s+.*|TITLE-\\d+\\s+.*"
+    description:
+      pattern: "\\s+https://"
+      message: "The PR description must contain a link."
+    commits-quantity:
+      quantity: "1-3"
+      message: "Too many commits in this PR!"
+  emails:
+    - rastislavbudinsky@gmail.com
+    - foo@bar.baz
+    - rbudinsk@redhat.com

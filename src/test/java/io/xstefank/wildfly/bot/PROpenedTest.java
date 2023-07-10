@@ -5,8 +5,10 @@ import io.quarkiverse.githubapp.testing.GitHubAppTest;
 import io.quarkus.test.junit.QuarkusTest;
 import io.xstefank.wildfly.bot.model.MockedGHPullRequestFileDetail;
 import org.junit.jupiter.api.Test;
+import org.kohsuke.github.GHCommitState;
 import org.kohsuke.github.GHEvent;
 import org.kohsuke.github.GHPullRequestFileDetail;
+import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.PagedSearchIterable;
 import org.mockito.Mockito;
 
@@ -27,7 +29,8 @@ public class PROpenedTest {
                 "wildfly-bot.yml", """
                     wildfly:
                       rules:
-                        - title: "Test"
+                        - id: "Test"
+                          title: "Test"
                           notify: [7125767235,0979986727]
                     """))
             .when().payloadFromClasspath("/pr-opened.json")
@@ -35,6 +38,9 @@ public class PROpenedTest {
             .then().github(mocks -> {
                 verify(mocks.pullRequest(1371642823))
                     .comment("/cc @0979986727, @7125767235");
+                GHRepository repo = mocks.repository("xstefank/wildfly");
+                Mockito.verify(repo).createCommitStatus("5db0f8e923d84fe05a60658ed5bb95f7aa23b66f",
+                        GHCommitState.ERROR, "", "\u274C title-check: Wrong content of the title!", "Format");
                 verifyNoMoreInteractions(mocks.ghObjects());
             });
     }
@@ -45,9 +51,10 @@ public class PROpenedTest {
                 "wildfly-bot.yml", """
                     wildfly:
                       rules:
-                        - title: "Hello"
-                        - body: "there"
-                        - titleBody: "test"
+                        - id: "Hello Test"
+                          title: "Hello"
+                          body: "there"
+                          titleBody: "test"
                           notify: [7125767235]
                     """))
             .when().payloadFromClasspath("/pr-opened.json")
@@ -55,6 +62,9 @@ public class PROpenedTest {
             .then().github(mocks -> {
                 verify(mocks.pullRequest(1371642823))
                     .comment("/cc @7125767235");
+                GHRepository repo = mocks.repository("xstefank/wildfly");
+                Mockito.verify(repo).createCommitStatus("5db0f8e923d84fe05a60658ed5bb95f7aa23b66f",
+                        GHCommitState.SUCCESS, "", "\u2705 Correct", "Format");
                 verifyNoMoreInteractions(mocks.ghObjects());
             });
     }
@@ -65,9 +75,10 @@ public class PROpenedTest {
                 "wildfly-bot.yml", """
                     wildfly:
                       rules:
-                        - title: "Hello"
-                        - body: "there"
-                        - titleBody: "foobar"
+                        - id: "Hello Test"
+                          title: "Hello"
+                          body: "there"
+                          titleBody: "foobar"
                           notify: [7125767235]
                     """))
             .when().payloadFromClasspath("/pr-opened.json")
@@ -75,6 +86,9 @@ public class PROpenedTest {
             .then().github(mocks -> {
                 verify(mocks.pullRequest(1371642823))
                     .comment("/cc @7125767235");
+                GHRepository repo = mocks.repository("xstefank/wildfly");
+                Mockito.verify(repo).createCommitStatus("5db0f8e923d84fe05a60658ed5bb95f7aa23b66f",
+                        GHCommitState.SUCCESS, "", "\u2705 Correct", "Format");
                 verifyNoMoreInteractions(mocks.ghObjects());
             });
     }
@@ -85,15 +99,19 @@ public class PROpenedTest {
                 "wildfly-bot.yml", """
                     wildfly:
                       rules:
-                        - title: "Hello"
-                        - body: "there"
-                        - titleBody: "General Kenobi"
+                        - id: "Hello Test"
+                          title: "Hello"
+                          body: "there"
+                          titleBody: "General Kenobi"
                           notify: [7125767235]
                     """))
             .when().payloadFromClasspath("/pr-opened.json")
             .event(GHEvent.PULL_REQUEST)
             .then().github(mocks -> {
                 verify(mocks.pullRequest(1371642823), never()).comment("/cc @7125767235");
+                GHRepository repo = mocks.repository("xstefank/wildfly");
+                Mockito.verify(repo).createCommitStatus("5db0f8e923d84fe05a60658ed5bb95f7aa23b66f",
+                        GHCommitState.SUCCESS, "", "\u2705 Correct", "Format");
                 verifyNoMoreInteractions(mocks.ghObjects());
             });
     }
@@ -105,7 +123,8 @@ public class PROpenedTest {
                     "wildfly-bot.yml", """
                         wildfly:
                           rules:
-                            - directories:
+                            - id: "Directory Test"
+                              directories:
                                - appclient
                               notify: [7125767235]
                         """);
@@ -130,7 +149,8 @@ public class PROpenedTest {
                     "wildfly-bot.yml", """
                         wildfly:
                           rules:
-                            - directories:
+                            - id: "Directory Test"
+                              directories:
                                - microprofile/health-smallrye
                               notify: [7125767235]
                         """);
@@ -155,7 +175,8 @@ public class PROpenedTest {
                     "wildfly-bot.yml", """
                         wildfly:
                           rules:
-                            - directories:
+                            - id: "Directory Test"
+                              directories:
                                - testsuite/integration
                               notify: [7125767235]
                         """);
@@ -180,7 +201,8 @@ public class PROpenedTest {
                     "wildfly-bot.yml", """
                         wildfly:
                           rules:
-                            - directories:
+                            - id: "Directory Test"
+                              directories:
                                - transactions
                               notify: [7125767235]
                         """);
@@ -195,6 +217,29 @@ public class PROpenedTest {
                 verify(mocks.pullRequest(1371642823)).listFiles();
                 verifyNoMoreInteractions(mocks.pullRequest(1371642823));
             });
+    }
+
+    @Test
+    void testPullRequestFormatTitleCheckOnOpen() throws IOException {
+        given().github(mocks -> mocks.configFileFromString("wildfly-bot.yml",
+            """
+            wildfly:
+              rules:
+                - title: "Hello"
+                - body: "there"
+                  notify: [7125767235]
+              format:
+                title-check:
+                  pattern: "\\\\[WFLY-\\\\d+\\\\]\\\\s+.*|WFLY-\\\\d+\\\\s+.*"
+                  message: "Wrong content of the title!"
+            """))
+                .when().payloadFromClasspath("/pr-opened.json")
+                .event(GHEvent.PULL_REQUEST)
+                .then().github(mocks -> {
+                    GHRepository repo = mocks.repository("xstefank/wildfly");
+                    Mockito.verify(repo).createCommitStatus("5db0f8e923d84fe05a60658ed5bb95f7aa23b66f",
+                            GHCommitState.ERROR, "", "\u274C title-check: Wrong content of the title!", "Format");
+                });
     }
 
     private GHPullRequestFileDetail[] mockFileDetails() {

@@ -1,7 +1,6 @@
 wildfly:
   rules:
     - title: "test"
-      id: "some test id"
     - id: "another great id"
       body: "test"
       notify: [The-non-existing-user]

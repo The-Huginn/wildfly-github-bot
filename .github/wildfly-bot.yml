@@ -6,10 +6,10 @@ wildfly:
       directories:
         - microprofile/lra
       notify: [xstefank]
-     - id: "health"
-       title: "health"
-       body: "health"
-       directories:
+    - id: "health"
+      title: "health"
+      body: "health"
+      directories:
         - microprofile/smallrye-health
         - health
   format:

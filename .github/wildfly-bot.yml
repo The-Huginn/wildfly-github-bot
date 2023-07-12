@@ -1,9 +1,9 @@
 wildfly:
   rules:
     - title: "test"
-    - id: "another great id"
-      body: "test"
-      notify: [The-non-existing-user]
+     - id: "another great id"
+       body: "test"
+       notify: [The-non-existing-user]
   format:
     title-check:
       pattern: "\\[TITLE-\\d+\\]\\s+.*|TITLE-\\d+\\s+.*"

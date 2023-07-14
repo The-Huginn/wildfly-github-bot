@@ -5,8 +5,10 @@ import io.quarkiverse.githubapp.testing.GitHubAppTest;
 import io.quarkus.test.junit.QuarkusTest;
 import io.xstefank.wildfly.bot.model.MockedGHPullRequestFileDetail;
 import org.junit.jupiter.api.Test;
+import org.kohsuke.github.GHCommitState;
 import org.kohsuke.github.GHEvent;
 import org.kohsuke.github.GHPullRequestFileDetail;
+import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.PagedSearchIterable;
 import org.mockito.Mockito;
 
@@ -24,16 +26,21 @@ public class PROpenedTest {
     @Test
     void testMentionsCCComment() throws IOException {
         given().github(mocks -> mocks.configFileFromString(
-                "wildfly-bot.yml",
-                "wildfly:\n" +
-                    "  rules:\n" +
-                    "    - title: \"Test\"\n" +
-                    "      notify: [7125767235,0979986727]"))
+                "wildfly-bot.yml", """
+                    wildfly:
+                      rules:
+                        - id: "Test"
+                          title: "Test"
+                          notify: [7125767235,0979986727]
+                    """))
             .when().payloadFromClasspath("/pr-opened.json")
             .event(GHEvent.PULL_REQUEST)
             .then().github(mocks -> {
                 verify(mocks.pullRequest(1371642823))
                     .comment("/cc @0979986727, @7125767235");
+                GHRepository repo = mocks.repository("xstefank/wildfly");
+                Mockito.verify(repo).createCommitStatus("5db0f8e923d84fe05a60658ed5bb95f7aa23b66f",
+                        GHCommitState.ERROR, "", "\u274C title-check: Wrong content of the title!", "Format");
                 verifyNoMoreInteractions(mocks.ghObjects());
             });
     }
@@ -41,18 +48,23 @@ public class PROpenedTest {
     @Test
     void testTitleBodyCheckForTitle() throws IOException {
         given().github(mocks -> mocks.configFileFromString(
-                "wildfly-bot.yml",
-                "wildfly:\n" +
-                    "  rules:\n" +
-                    "    - title: \"Hello\"\n" +
-                    "    - body: \"there\"\n" +
-                    "    - titleBody: \"test\"\n" +
-                    "      notify: [7125767235]"))
+                "wildfly-bot.yml", """
+                    wildfly:
+                      rules:
+                        - id: "Hello Test"
+                          title: "Hello"
+                          body: "there"
+                          titleBody: "test"
+                          notify: [7125767235]
+                    """))
             .when().payloadFromClasspath("/pr-opened.json")
             .event(GHEvent.PULL_REQUEST)
             .then().github(mocks -> {
                 verify(mocks.pullRequest(1371642823))
                     .comment("/cc @7125767235");
+                GHRepository repo = mocks.repository("xstefank/wildfly");
+                Mockito.verify(repo).createCommitStatus("5db0f8e923d84fe05a60658ed5bb95f7aa23b66f",
+                        GHCommitState.SUCCESS, "", "\u2705 Correct", "Format");
                 verifyNoMoreInteractions(mocks.ghObjects());
             });
     }
@@ -60,18 +72,23 @@ public class PROpenedTest {
     @Test
     void testTitleBodyCheckForBody() throws IOException {
         given().github(mocks -> mocks.configFileFromString(
-                "wildfly-bot.yml",
-                "wildfly:\n" +
-                    "  rules:\n" +
-                    "    - title: \"Hello\"\n" +
-                    "    - body: \"there\"\n" +
-                    "    - titleBody: \"foobar\"\n" +
-                    "      notify: [7125767235]"))
+                "wildfly-bot.yml", """
+                    wildfly:
+                      rules:
+                        - id: "Hello Test"
+                          title: "Hello"
+                          body: "there"
+                          titleBody: "foobar"
+                          notify: [7125767235]
+                    """))
             .when().payloadFromClasspath("/pr-opened.json")
             .event(GHEvent.PULL_REQUEST)
             .then().github(mocks -> {
                 verify(mocks.pullRequest(1371642823))
                     .comment("/cc @7125767235");
+                GHRepository repo = mocks.repository("xstefank/wildfly");
+                Mockito.verify(repo).createCommitStatus("5db0f8e923d84fe05a60658ed5bb95f7aa23b66f",
+                        GHCommitState.SUCCESS, "", "\u2705 Correct", "Format");
                 verifyNoMoreInteractions(mocks.ghObjects());
             });
     }
@@ -79,17 +96,22 @@ public class PROpenedTest {
     @Test
     void testFailedTitleBodyCheck() throws IOException {
         given().github(mocks -> mocks.configFileFromString(
-                "wildfly-bot.yml",
-                "wildfly:\n" +
-                    "  rules:\n" +
-                    "    - title: \"Hello\"\n" +
-                    "    - body: \"there\"\n" +
-                    "    - titleBody: \"General Kenobi\"\n" +
-                    "      notify: [7125767235]"))
+                "wildfly-bot.yml", """
+                    wildfly:
+                      rules:
+                        - id: "Hello Test"
+                          title: "Hello"
+                          body: "there"
+                          titleBody: "General Kenobi"
+                          notify: [7125767235]
+                    """))
             .when().payloadFromClasspath("/pr-opened.json")
             .event(GHEvent.PULL_REQUEST)
             .then().github(mocks -> {
                 verify(mocks.pullRequest(1371642823), never()).comment("/cc @7125767235");
+                GHRepository repo = mocks.repository("xstefank/wildfly");
+                Mockito.verify(repo).createCommitStatus("5db0f8e923d84fe05a60658ed5bb95f7aa23b66f",
+                        GHCommitState.SUCCESS, "", "\u2705 Correct", "Format");
                 verifyNoMoreInteractions(mocks.ghObjects());
             });
     }
@@ -98,12 +120,14 @@ public class PROpenedTest {
     void testDirectoriesMentionsNewFileInDiff() throws IOException {
         given().github(mocks -> {
                 mocks.configFileFromString(
-                    "wildfly-bot.yml",
-                    "wildfly:\n" +
-                        "  rules:\n" +
-                        "    - directories:\n" +
-                        "       - appclient\n" +
-                        "      notify: [7125767235]");
+                    "wildfly-bot.yml", """
+                        wildfly:
+                          rules:
+                            - id: "Directory Test"
+                              directories:
+                               - appclient
+                              notify: [7125767235]
+                        """);
 
                 PagedSearchIterable<GHPullRequestFileDetail> fileDetails = GitHubAppMockito.mockPagedIterable(mockFileDetails());
                 Mockito.when(mocks.pullRequest(1371642823).listFiles()).thenReturn(fileDetails);
@@ -122,12 +146,14 @@ public class PROpenedTest {
     void testDirectoriesMentionsChangeInSubdirectoryDiff() throws IOException {
         given().github(mocks -> {
                 mocks.configFileFromString(
-                    "wildfly-bot.yml",
-                    "wildfly:\n" +
-                        "  rules:\n" +
-                        "    - directories:\n" +
-                        "       - microprofile/health-smallrye\n" +
-                        "      notify: [7125767235]");
+                    "wildfly-bot.yml", """
+                        wildfly:
+                          rules:
+                            - id: "Directory Test"
+                              directories:
+                               - microprofile/health-smallrye
+                              notify: [7125767235]
+                        """);
 
                 PagedSearchIterable<GHPullRequestFileDetail> fileDetails = GitHubAppMockito.mockPagedIterable(mockFileDetails());
                 Mockito.when(mocks.pullRequest(1371642823).listFiles()).thenReturn(fileDetails);
@@ -146,12 +172,14 @@ public class PROpenedTest {
     void testDirectoriesMentionsChangeInSubdirectoryOfConfiguredDirectoryDiff() throws IOException {
         given().github(mocks -> {
                 mocks.configFileFromString(
-                    "wildfly-bot.yml",
-                    "wildfly:\n" +
-                        "  rules:\n" +
-                        "    - directories:\n" +
-                        "       - testsuite/integration\n" +
-                        "      notify: [7125767235]");
+                    "wildfly-bot.yml", """
+                        wildfly:
+                          rules:
+                            - id: "Directory Test"
+                              directories:
+                               - testsuite/integration
+                              notify: [7125767235]
+                        """);
 
                 PagedSearchIterable<GHPullRequestFileDetail> fileDetails = GitHubAppMockito.mockPagedIterable(mockFileDetails());
                 Mockito.when(mocks.pullRequest(1371642823).listFiles()).thenReturn(fileDetails);
@@ -170,12 +198,14 @@ public class PROpenedTest {
     void testDirectoriesMentionsNoHitInDiff() throws IOException {
         given().github(mocks -> {
                 mocks.configFileFromString(
-                    "wildfly-bot.yml",
-                    "wildfly:\n" +
-                        "  rules:\n" +
-                        "    - directories:\n" +
-                        "       - transactions\n" +
-                        "      notify: [7125767235]");
+                    "wildfly-bot.yml", """
+                        wildfly:
+                          rules:
+                            - id: "Directory Test"
+                              directories:
+                               - transactions
+                              notify: [7125767235]
+                        """);
 
                 PagedSearchIterable<GHPullRequestFileDetail> fileDetails = GitHubAppMockito.mockPagedIterable(mockFileDetails());
                 Mockito.when(mocks.pullRequest(1371642823).listFiles()).thenReturn(fileDetails);
@@ -187,6 +217,29 @@ public class PROpenedTest {
                 verify(mocks.pullRequest(1371642823)).listFiles();
                 verifyNoMoreInteractions(mocks.pullRequest(1371642823));
             });
+    }
+
+    @Test
+    void testPullRequestFormatTitleCheckOnOpen() throws IOException {
+        given().github(mocks -> mocks.configFileFromString("wildfly-bot.yml",
+            """
+            wildfly:
+              rules:
+                - title: "Hello"
+                - body: "there"
+                  notify: [7125767235]
+              format:
+                title-check:
+                  pattern: "\\\\[WFLY-\\\\d+\\\\]\\\\s+.*|WFLY-\\\\d+\\\\s+.*"
+                  message: "Wrong content of the title!"
+            """))
+                .when().payloadFromClasspath("/pr-opened.json")
+                .event(GHEvent.PULL_REQUEST)
+                .then().github(mocks -> {
+                    GHRepository repo = mocks.repository("xstefank/wildfly");
+                    Mockito.verify(repo).createCommitStatus("5db0f8e923d84fe05a60658ed5bb95f7aa23b66f",
+                            GHCommitState.ERROR, "", "\u274C title-check: Wrong content of the title!", "Format");
+                });
     }
 
     private GHPullRequestFileDetail[] mockFileDetails() {

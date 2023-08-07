@@ -1,7 +1,9 @@
 package io.xstefank.wildfly.bot;
 
 import io.quarkiverse.githubapp.testing.GitHubAppTest;
+import io.quarkiverse.githubapp.testing.dsl.GitHubMockContext;
 import io.quarkus.test.junit.QuarkusTest;
+import io.xstefank.wildfly.bot.helper.MockedGHPullRequestProcessor;
 import io.xstefank.wildfly.bot.model.MockedGHPullRequestFileDetail;
 import io.xstefank.wildfly.bot.model.RuntimeConstants;
 import io.xstefank.wildfly.bot.utils.GitHubJson;
@@ -11,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.kohsuke.github.GHCommitState;
 import org.kohsuke.github.GHContent;
 import org.kohsuke.github.GHEvent;
-import org.kohsuke.github.GHPullRequest;
 import org.kohsuke.github.GHPullRequestFileDetail;
 import org.kohsuke.github.GHRepository;
 import org.mockito.Mockito;
@@ -19,10 +20,8 @@ import org.mockito.Mockito;
 import java.io.IOException;
 
 import static io.quarkiverse.githubapp.testing.GitHubAppTesting.given;
-import static io.xstefank.wildfly.bot.helper.MockedGHPullRequestProcessor.mockEmptyComments;
-import static io.xstefank.wildfly.bot.helper.MockedGHPullRequestProcessor.processPullRequestMock;
-import static io.xstefank.wildfly.bot.utils.TestConstants.VALID_PR_TEMPLATE_JSON;
 import static io.xstefank.wildfly.bot.utils.TestConstants.TEST_REPO;
+import static io.xstefank.wildfly.bot.utils.TestConstants.VALID_PR_TEMPLATE_JSON;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -64,7 +63,7 @@ public class PRConfigFileChangeTest {
                             - address@email.com""",
                     "UTF-8"));
 
-                mockPullRequestContents(mocks.pullRequest(gitHubJson.id()));
+                mockPullRequestContents(mocks, gitHubJson.id());
             })
             .when().payloadFromString(gitHubJson.jsonString())
             .event(GHEvent.PULL_REQUEST)
@@ -108,7 +107,7 @@ public class PRConfigFileChangeTest {
                             - address@email.com""",
                     "UTF-8"));
 
-                mockPullRequestContents(mocks.pullRequest(gitHubJson.id()));
+                mockPullRequestContents(mocks, gitHubJson.id());
             })
             .when().payloadFromString(gitHubJson.jsonString())
             .event(GHEvent.PULL_REQUEST)
@@ -123,7 +122,7 @@ public class PRConfigFileChangeTest {
             });
     }
 
-    private static void mockPullRequestContents(GHPullRequest pullRequestMock) throws IOException {
+    private static void mockPullRequestContents(GitHubMockContext mocks, long pullRequest) throws IOException {
         GHPullRequestFileDetail[] fileDetails = {
             new MockedGHPullRequestFileDetail("62ca1d70d69efbf5ab79d46512292c29df72a9b1",
                 ".github/wildfly-bot.yml", "modified", 3, 2, 5,
@@ -134,6 +133,8 @@ public class PRConfigFileChangeTest {
                 null)
         };
 
-        processPullRequestMock(pullRequestMock, fileDetails, mockEmptyComments());
+        MockedGHPullRequestProcessor.builder(pullRequest)
+                .fileDetails(fileDetails)
+                .mock(mocks);
     }
 }

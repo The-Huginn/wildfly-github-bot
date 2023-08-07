@@ -10,13 +10,15 @@ import io.xstefank.wildfly.bot.format.TitleCheck;
 import io.xstefank.wildfly.bot.model.RegexDefinition;
 import io.xstefank.wildfly.bot.model.RuntimeConstants;
 import io.xstefank.wildfly.bot.model.WildFlyConfigFile;
-import io.xstefank.wildfly.bot.util.GithubCommitProcessor;
+import io.xstefank.wildfly.bot.util.GithubProcessor;
+import io.xstefank.wildfly.bot.util.Matcher;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import org.jboss.logging.Logger;
 import org.kohsuke.github.GHEventPayload;
 import org.kohsuke.github.GHIssueComment;
 import org.kohsuke.github.GHPullRequest;
+import org.kohsuke.github.GitHub;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -43,14 +45,15 @@ public class PullRequestFormatProcessor {
         """;
 
     @Inject
-    GithubCommitProcessor githubCommitProcessor;
+    GithubProcessor githubProcessor;
 
     @Inject
     WildFlyBotConfig wildFlyBotConfig;
 
-    void verifyFormat(@PullRequest.Edited @PullRequest.Opened @PullRequest.Synchronize @PullRequest.Reopened
-                      @PullRequest.ReadyForReview GHEventPayload.PullRequest pullRequestPayload,
-                      @ConfigFile(RuntimeConstants.CONFIG_FILE_NAME) WildFlyConfigFile wildflyConfigFile) throws IOException {
+    void onPullRequestEdited(@PullRequest.Edited @PullRequest.Opened @PullRequest.Synchronize @PullRequest.Reopened
+                             @PullRequest.ReadyForReview GHEventPayload.PullRequest pullRequestPayload,
+                             @ConfigFile(RuntimeConstants.CONFIG_FILE_NAME) WildFlyConfigFile wildflyConfigFile,
+                             GitHub gitHub) throws IOException {
         if (wildflyConfigFile == null) {
             LOG.error("No configuration file available. ");
             return;
@@ -68,13 +71,29 @@ public class PullRequestFormatProcessor {
         }
 
         if (errors.isEmpty()) {
-            githubCommitProcessor.commitStatusSuccess(pullRequest, CHECK_NAME, "Valid");
+            githubProcessor.commitStatusSuccess(pullRequest, CHECK_NAME, "Valid");
             deleteFormatComment(pullRequest);
         } else {
-            githubCommitProcessor.commitStatusError(pullRequest, CHECK_NAME, "Failed checks: " + String.join(", ", errors.keySet()));
+            githubProcessor.commitStatusError(pullRequest, CHECK_NAME, "Failed checks: " + String.join(", ", errors.keySet()));
             formatComment(pullRequest, errors.values());
         }
 
+        List<String> mentions = new ArrayList<>();
+
+        if (wildflyConfigFile.wildfly.rules != null) {
+            for (WildFlyConfigFile.WildFlyRule rule : wildflyConfigFile.wildfly.rules) {
+                if (!rule.notify.isEmpty() && Matcher.matches(pullRequest, rule)) {
+                    LOG.infof("Pull Request %s was matched with a rule, containing notify, with the id: %s.", pullRequest.getTitle(), rule.id != null ? rule.id : "N/A");
+                    for (String nick : rule.notify) {
+                        if (!nick.equals(pullRequest.getUser().getLogin()) && !mentions.contains(nick)) {
+                            mentions.add(nick);
+                        }
+                    }
+                }
+            }
+        }
+
+        githubProcessor.processMentions(pullRequest, gitHub, mentions);
     }
 
     void postDependabotInfo(@PullRequest.Opened GHEventPayload.PullRequest pullRequestPayload,

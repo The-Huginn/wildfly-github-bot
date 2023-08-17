@@ -25,3 +25,4 @@ wildfly:
   emails:
     - random-person@bar.baz
     - another-random-person@gmail.com
+    - rbudinsk@redhat.com

@@ -10,7 +10,7 @@ wildfly:
       labels: [ hello-label ]
 
     - id: "last id"
-      directories: [ src/main, src/test/org/acme/resources ]
+      directories: [ src/main ]
       notify: [ xstefank ]
 
     - id: "new id"

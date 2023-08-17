@@ -11,7 +11,7 @@ wildfly:
 
     - id: "last id"
       directories: [ src/main, src/test/org/acme/resources ]
-      notify: [ another-random-person ]
+      notify: [ xstefank ]
 
     - id: "new id"
       directories: [ pom.xml ]

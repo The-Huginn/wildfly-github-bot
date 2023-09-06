@@ -6,6 +6,7 @@ This project is build with usage of Quarkus GitHub App: https://quarkiverse.gith
 
 
 
+
 ## Development
 ### Step 1 - Register the application
 

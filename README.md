@@ -6,8 +6,7 @@ This project is build with usage of Quarkus GitHub App: https://quarkiverse.gith
 
 
 
-
-## Development
+ZZ## Development
 ### Step 1 - Register the application
 
 After forking the project we need to register wildfly-github-bot on GitHub for your account. Go to [GitHub Apps](https://github.com/settings/apps) and click on `New GitHub Apps`

@@ -4,6 +4,7 @@ wildfly-github-bot helps you to keep your pull requests in the correct format.
 This project is build with usage of Quarkus GitHub App: https://quarkiverse.github.io/quarkiverse-docs/quarkus-github-app/dev/index.html
 
 
+
 ## Development
 ### Step 1 - Register the application
 

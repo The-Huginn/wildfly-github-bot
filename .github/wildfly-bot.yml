@@ -1,18 +1,28 @@
 wildfly:
   rules:
-    - title: "test"
-    - body: "test"
-      notify: [The-non-existing-user]
+    - id: "this is id"
+      title: "resteasy"
+      notify:
+        - random-person
+    - id: "more useful id"
+      title: "hibernate"
+      notify: [ random-person ]
+      labels: [ hello-label ]
+
+    - id: "last id"
+      directories: [ src/main ]
+      notify: [ xstefank ]
+
+    - id: "new id"
+      directories: [ pom.xml ]
+
   format:
-    title-check:
-      pattern: "\\[TITLE-\\d+\\]\\s+.*|TITLE-\\d+\\s+.*"
     description:
-      pattern: "\\s+https://"
-      message: "The PR description must contain a link."
-    commits-quantity:
-      quantity: "1-3"
-      message: "Too many commits in this PR!"
+      regexes:
+        - pattern: "JIRA:\\s+https://issues.redhat.com/browse/WFLY-\\d+|https://issues.redhat.com/browse/WFLY-\\d+"
+          message: "The PR description must contain a link to the JIRA issue"
+
   emails:
-    - rastislavbudinsky@gmail.com
-    - foo@bar.baz
+    - random-person@bar.baz
+    - another-random-person@gmail.com
     - rbudinsk@redhat.com

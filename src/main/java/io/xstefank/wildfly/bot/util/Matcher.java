@@ -1,8 +1,6 @@
-package io.xstefank.wildlfy.bot.config.util;
+package io.xstefank.wildfly.bot.util;
 
-import com.hrakaroo.glob.GlobPattern;
-import com.hrakaroo.glob.MatchingEngine;
-import io.xstefank.wildlfy.bot.config.WildFlyConfigFile.WildFlyRule;
+import io.xstefank.wildfly.bot.model.WildFlyConfigFile.WildFlyRule;
 import org.jboss.logging.Logger;
 import org.kohsuke.github.GHPullRequest;
 import org.kohsuke.github.GHPullRequestFileDetail;
@@ -34,19 +32,8 @@ public class Matcher {
         if (!rule.directories.isEmpty()) {
             for (GHPullRequestFileDetail changedFile : pullRequest.listFiles()) {
                 for (String directory : rule.directories) {
-                    if (!directory.contains("*")) {
-                        if (changedFile.getFilename().startsWith(directory)) {
-                            return true;
-                        }
-                    } else {
-                        try {
-                            MatchingEngine matchingEngine = GlobPattern.compile(directory);
-                            if (matchingEngine.matches(changedFile.getFilename())) {
-                                return true;
-                            }
-                        } catch (Exception e) {
-                            LOG.error("Error evaluating glob expression: " + directory, e);
-                        }
+                    if (changedFile.getFilename().startsWith(directory)) {
+                        return true;
                     }
                 }
             }

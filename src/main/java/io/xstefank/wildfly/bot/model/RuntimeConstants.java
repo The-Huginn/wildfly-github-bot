@@ -1,4 +1,4 @@
-package io.xstefank.wildlfy.bot.config;
+package io.xstefank.wildfly.bot.model;
 
 public class RuntimeConstants {
 

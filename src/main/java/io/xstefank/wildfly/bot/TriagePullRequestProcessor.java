@@ -1,11 +1,11 @@
-package io.xstefank.wildlfy.bot;
+package io.xstefank.wildfly.bot;
 
 import io.quarkiverse.githubapp.ConfigFile;
 import io.quarkiverse.githubapp.event.PullRequest;
-import io.xstefank.wildlfy.bot.config.RuntimeConstants;
-import io.xstefank.wildlfy.bot.config.WildFlyConfigFile;
-import io.xstefank.wildlfy.bot.config.WildFlyConfigFile.WildFlyRule;
-import io.xstefank.wildlfy.bot.config.util.Matcher;
+import io.xstefank.wildfly.bot.config.RuntimeConstants;
+import io.xstefank.wildfly.bot.config.WildFlyConfigFile;
+import io.xstefank.wildfly.bot.config.WildFlyConfigFile.WildFlyRule;
+import io.xstefank.wildfly.bot.config.util.Matcher;
 import org.jboss.logging.Logger;
 import org.kohsuke.github.GHEventPayload;
 import org.kohsuke.github.GHPullRequest;
@@ -29,13 +29,11 @@ public class TriagePullRequestProcessor {
         Set<String> mentions = new TreeSet<>();
 
         for (WildFlyRule rule : wildflyBotConfigFile.wildfly.rules) {
-            if (rule.id != null) {
-                if (Matcher.matches(pullRequest, rule)) {
-                    LOG.debugf("Matched rule with id: %s.", rule.id);
-                    for (String nick : rule.notify) {
-                        if (!nick.equals(pullRequest.getUser().getLogin())) {
-                            mentions.add(nick);
-                        }
+            if (Matcher.matches(pullRequest, rule)) {
+                 LOG.debugf("Pull Request %s was matched with a rule with the id: %s.", pullRequest.getTitle(), rule.id != null ? rule.id : "N/A");
+                for (String nick : rule.notify) {
+                    if (!nick.equals(pullRequest.getUser().getLogin())) {
+                        mentions.add(nick);
                     }
                 }
             }

@@ -1,4 +1,4 @@
-package io.xstefank.wildlfy.bot.config;
+package io.xstefank.wildfly.bot.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
@@ -35,7 +35,7 @@ public class WildFlyConfigFile {
 
         @Override
         public String toString() {
-            return "id=" + stringify(id) + " title=" + stringify(title) + " body=" + stringify(body) + " titleBody=" + stringify(titleBody);
+            return "id=" + stringify(id) + " title=" + stringify(title) + " body=" + stringify(body) + " titleBody=" + stringify(titleBody) + " directories=" + directories + " notify=" + notify;
         }
 
         private String stringify(String value) {

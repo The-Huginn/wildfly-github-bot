@@ -1,10 +1,9 @@
-package io.xstefank.wildlfy.bot.config;
+package io.xstefank.wildfly.bot.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 
 public class WildFlyConfigFile {
 
@@ -15,6 +14,8 @@ public class WildFlyConfigFile {
         public List<WildFlyRule> rules;
 
         public Format format;
+
+        public List<String> emails;
     }
 
     public static final class WildFlyRule {
@@ -27,15 +28,15 @@ public class WildFlyConfigFile {
 
         public String titleBody;
 
-        @JsonDeserialize(as = TreeSet.class)
-        public Set<String> directories = new TreeSet<>();
+        @JsonDeserialize(as = ArrayList.class)
+        public List<String> directories = new ArrayList<>();
 
-        @JsonDeserialize(as = TreeSet.class)
-        public Set<String> notify = new TreeSet<>();
+        @JsonDeserialize(as = ArrayList.class)
+        public List<String> notify = new ArrayList<>();
 
         @Override
         public String toString() {
-            return "id=" + stringify(id) + " title=" + stringify(title) + " body=" + stringify(body) + " titleBody=" + stringify(titleBody);
+            return "id=" + stringify(id) + " title=" + stringify(title) + " body=" + stringify(body) + " titleBody=" + stringify(titleBody) + " directories=" + directories + " notify=" + notify;
         }
 
         private String stringify(String value) {

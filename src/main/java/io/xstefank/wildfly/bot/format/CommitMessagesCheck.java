@@ -1,6 +1,6 @@
-package io.xstefank.wildlfy.bot.format;
+package io.xstefank.wildfly.bot.format;
 
-import io.xstefank.wildlfy.bot.config.RegexDefinition;
+import io.xstefank.wildfly.bot.model.RegexDefinition;
 import org.kohsuke.github.GHPullRequest;
 import org.kohsuke.github.GHPullRequestCommitDetail;
 import org.kohsuke.github.PagedIterable;
@@ -10,8 +10,6 @@ import java.io.IOException;
 
 public class CommitMessagesCheck implements Check {
 
-    static final String DEFAULT_MESSAGE = "One of the commit messages has wrong format";
-
     private Pattern pattern;
     private String message;
 
@@ -20,7 +18,7 @@ public class CommitMessagesCheck implements Check {
             throw new IllegalArgumentException("Input argument cannot be null");
         }
         pattern = description.pattern;
-        message = (description.message != null) ? description.message : DEFAULT_MESSAGE;
+        message = description.message;
     }
 
     @Override
@@ -36,7 +34,7 @@ public class CommitMessagesCheck implements Check {
             Matcher matcher = pattern.matcher(commitMessage);
 
             if (!matcher.matches()) {
-                return "For commit: " + commitMessage + " " + this.message;
+                return String.format("For commit: \"%s\" (%s) - %s" , commitMessage, commit.getSha(), this.message);
             }
         }
         return null;
@@ -44,6 +42,6 @@ public class CommitMessagesCheck implements Check {
 
     @Override
     public String getName() {
-        return "commits-message";
+        return "commit";
     }
 }

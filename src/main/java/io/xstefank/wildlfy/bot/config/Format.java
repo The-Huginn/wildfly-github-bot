@@ -1,4 +1,4 @@
-package io.xstefank.wildlfy.bot.config;
+package io.xstefank.wildfly.bot.config;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -7,7 +7,8 @@ public final class Format {
     @JsonProperty("title-check")
     public RegexDefinition titleCheck;
 
-    public RegexDefinition description;
+    @JsonProperty("description")
+    public Description description;
 
     @JsonProperty("commits-message")
     public RegexDefinition commitsMessage;

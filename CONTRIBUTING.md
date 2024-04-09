@@ -1,7 +1,7 @@
 Contributing to WildFly Github Bot
 ==================================
 
-Welcome to the WildFly Github Bot project and thank you for deciding to contribute to this project! We welcome contributions from the community. This guide will walk you through the steps for getting started on our project.
+Welcome to the WildFly Github Bot project and thank you for deciding to contribute to this project! We welcome contributions from the community. This guide will walk you through the steps for getting started on our projectasd.
 
 - [Forking the Project](#forking-the-project)
 - [Issues](#issues)

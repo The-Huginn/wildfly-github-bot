@@ -1,0 +1,28 @@
+wildfly:
+  rules:
+    - id: "this is id"
+      title: "resteasy"
+      notify:
+        - random-person
+    - id: "more useful id"
+      title: "hibernate"
+      notify: [ random-person ]
+      labels: [ hello-label ]
+
+    - id: "last id"
+      directories: [ src/main ]
+      notify: [ xstefank ]
+
+    - id: "new id"
+      directories: [ pom.xml ]
+
+  format:
+    description:
+      regexes:
+        - pattern: "JIRA:\\s+https://issues.redhat.com/browse/WFLY-\\d+|https://issues.redhat.com/browse/WFLY-\\d+"
+          message: "The PR description must contain a link to the JIRA issue"
+
+  emails:
+    - random-person@bar.baz
+    - another-random-person@gmail.com
+    - rbudinsk@redhat.com

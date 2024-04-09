@@ -52,7 +52,7 @@ Add a remote ref to upstream, for pulling future updates, i.e. synchronizing the
 For example:
 
 ```
-git remote add upstream https://github.com/wildfly/wildfly-github-bot.git
+git remote add upstream https://github.com/wildfly/wildfly-github-bot.gitasd
 ```
 
 ## Running the github bot

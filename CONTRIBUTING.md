@@ -26,7 +26,7 @@ Be sure to replace [URL] with the URL that you copied.
 Now you have this repository on your computer!
 
 ## Issues
-The WildFly Github bot project currently uses Github issues as means of filing new issues.
+The WildFly Github bot project currently uses Github issues as means of filing new issues.asd
 
 To create an issue simple click on tab "Issues" and then on the button "New issue"
 

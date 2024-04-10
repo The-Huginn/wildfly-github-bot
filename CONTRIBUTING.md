@@ -17,7 +17,7 @@ This can be done by going to your newly forked repository, which should be at `h
 
 Then, there will be a green button that says "Code". Click on that and copy the URL.
 
-Then, in your terminal, paste the following command:
+Then, in your terminal, paste the following command:asd
 ```bash
 git clone [URL]
 ```

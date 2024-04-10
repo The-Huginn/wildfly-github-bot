@@ -67,7 +67,7 @@ Finally, we can run the github bot:
 Or to run only tests use:
 
 ```bash
-./mvnw clean quarkus:test
+./mvnw clean quarkus:testasd
 ```
 
 ## Contributing Guidelines

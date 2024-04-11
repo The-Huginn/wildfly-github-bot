@@ -19,7 +19,7 @@ Fields to fill in:
 - Add this link to `Webhook URL`
 4. Set up permissions
 - `Commit statuses` - `Access: Read and write`
-- `Contents` - `Access Read-only`
+- `Contents` - `Access Read-only`asd
 - `Metadata` - `Access: Read-only`
 - `Pull requests` - `Access: Read and write`
 5. Subscribe to events

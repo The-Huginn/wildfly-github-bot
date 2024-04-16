@@ -7,7 +7,7 @@ Welcome to the WildFly Github Bot project and thank you for deciding to contribu
 - [Issues](#issues)
     - [Good First Issues](#good-first-issues)
 - [Setting up your Developer Environment](#setting-up-your-developer-environment)
-- [Contributing Guidelines](#contributing-guidelines)asdasd
+- [Contributing Guidelines](#contributing-guidelines)asdasdasd
 
 
 ## Forking the Projectasdasd

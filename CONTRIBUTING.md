@@ -48,7 +48,7 @@ You will need:
 
 First `cd` to the directory where you cloned the project (eg: `cd wildfly-github-bot`)
 
-Add a remote ref to upstream, for pulling future updates, i.e. synchronizing the this repository.
+Add a remote ref to upstream, for pulling future updates, i.e. synchronizing the this repository.asd
 For example:
 
 ```
